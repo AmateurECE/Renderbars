@@ -1,5 +1,4 @@
-use handlebars::{Handlebars, Helper, Context, RenderContext, Output,
-		 RenderError};
+use handlebars::{Handlebars, Output};
 use std::collections::HashMap;
 use clap::{Arg, App};
 use std::error::Error;
@@ -10,7 +9,7 @@ use std::io::Read;
 fn stdin_helper(
     _: &handlebars::Helper, _: &handlebars::Handlebars,
     _: &handlebars::Context, _: &mut handlebars::RenderContext,
-    out: &mut dyn handlebars::Output
+    out: &mut dyn Output
 ) -> Result<(), handlebars::RenderError> {
     let mut contents = String::new();
     io::stdin().read_to_string(&mut contents)?;
@@ -24,8 +23,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         .author("Ethan D. Twardy <ethan.twardy@gmail.com>")
         .about("Render Handlebars templates on the command line")
         .arg(Arg::with_name("context")
-             .help("Set a variable in the context. Takes a parameter of the "
-		   + "form 'name=val'")
+             .help("Set a variable in the context. Takes a parameter of the \
+                    form 'name=val'")
              .short("c")
              .long("context")
              .takes_value(true)
@@ -51,7 +50,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 		    "Context field '{}' must be of the form 'name=val'",
 		    entry);
             let entry = entry.splitn(2, '=').collect::<Vec<&str>>();
-            if entry[1].starts_with("{{") || entry[1].starts_with("\{{") {
+            if entry[1].starts_with("{{") || entry[1].starts_with("\\{{") {
                 data.insert(entry[0],
 			    handlebars.render_template(entry[1], &data)?);
             } else {
