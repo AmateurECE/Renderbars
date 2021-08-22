@@ -1,0 +1,19 @@
+Source: renderbars
+Section: misc
+Priority: optional
+Maintainer: Ethan D. Twardy <ethan.twardy@gmail.com>
+Build-Depends: debhelper-compat (= 13), cargo (>= 0.47.0-3+b1), rustc (>= 1.48.0+dfsg1-2)
+Standards-Version: 4.5.1
+Homepage: https://github.com/AmateurECE/Renderbars
+Vcs-Browser: https://github.com/AmateurECE/Renderbars
+Vcs-Git: https://github.com/AmateurECE/Renderbars
+Rules-Requires-Root: no
+
+Package: renderbars
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Render Handlebars templates with a command line tool
+ I write a lot of things that feel like they should be generated automatically
+ by a template engine. Renderbars is an application to render input files as
+ Handlebars templates, taking context on the command line, and writing the
+ resulting contents to an output file.
