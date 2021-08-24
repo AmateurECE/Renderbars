@@ -38,3 +38,22 @@ $ renderbars -c "foo=bar" -c "baz=\{{baz}}" input.hbs intermediate.hbs
 
 $ renderbars -c "baz=valueOfBaz" intermediate.hbs
 ```
+
+You can even load context from a file with the `-f` flag. The format for this
+file is very simple:
+
+```
+# Lines starting with '#' are ignored...
+    # Even if there's white space in front
+
+# Set variables:
+var_name=50
+
+# Or...
+var_name = 50
+
+# INVALID: Comments are not valid on the same lines as context
+does_not_work = 50 # NOT VALID!!!!
+```
+
+Variables passed on the command line override variables in the context file.

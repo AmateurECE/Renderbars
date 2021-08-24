@@ -8,7 +8,7 @@
 #
 # CREATED:	    08/21/2021
 #
-# LAST EDITED:	    08/21/2021
+# LAST EDITED:	    08/23/2021
 ###
 
 binName=renderbars
@@ -38,7 +38,7 @@ zipArchive=../$(packageName)_$(version).orig.tar.xz
 
 zip: $(zipArchive)
 
-$(zipArchive): $(shell find .)
+$(zipArchive):
 	tar cJvf $@ `ls | grep -v '^\.git$$'`
 
 package: $(zipArchive)

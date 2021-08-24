@@ -4,7 +4,7 @@ use clap::{Arg, App};
 use std::error::Error;
 use std::fs::File;
 use std::io;
-use std::io::Read;
+use std::io::{BufRead, Read};
 
 fn stdin_helper(
     _: &handlebars::Helper, _: &handlebars::Handlebars,
@@ -14,6 +14,19 @@ fn stdin_helper(
     let mut contents = String::new();
     io::stdin().read_to_string(&mut contents)?;
     out.write(contents.as_str())?;
+    Ok(())
+}
+
+fn context_from_file(context: &mut HashMap<String, String>, filename: &str) -> Result<(), Box<dyn Error>> {
+    for entry in io::BufReader::new(File::open(filename)?).lines().map(|v| v.unwrap()) {
+        let line = entry.trim();
+        if line.is_empty() || line.chars().nth(0) == Some('#') {
+            continue;
+        }
+
+        let line = entry.splitn(2, '=').collect::<Vec<&str>>();
+        context.insert(line[0].trim().to_string(), line[1].trim().to_string());
+    }
     Ok(())
 }
 
@@ -35,7 +48,14 @@ fn main() -> Result<(), Box<dyn Error>> {
              .required(true)
              .index(1))
         .arg(Arg::with_name("output")
-             .help("Output file name. If not provided, renders to stdout."));
+             .help("Output file name. If not provided, renders to stdout."))
+        .arg(Arg::with_name("context-file")
+            .help("Read context from file")
+            .short("f")
+            .long("context-file")
+            .takes_value(true)
+            .number_of_values(1)
+         );
     let matches = application.get_matches();
 
     let mut handlebars = Handlebars::new();
@@ -44,6 +64,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     handlebars.set_strict_mode(true);
 
     let mut data = HashMap::new();
+    if let Some(context_file) = matches.value_of("context-file") {
+        context_from_file(&mut data, context_file)?;
+    }
     if let Some(context) = matches.values_of("context") {
         for entry in context.collect::<Vec<&str>>() {
             assert!(entry.contains('='),
@@ -51,10 +74,10 @@ fn main() -> Result<(), Box<dyn Error>> {
 		    entry);
             let entry = entry.splitn(2, '=').collect::<Vec<&str>>();
             if entry[1].starts_with("{{") || entry[1].starts_with("\\{{") {
-                data.insert(entry[0],
+                data.insert(entry[0].to_string(),
 			    handlebars.render_template(entry[1], &data)?);
             } else {
-                data.insert(entry[0], entry[1].to_string());
+                data.insert(entry[0].to_string(), entry[1].to_string());
             }
         }
     }
