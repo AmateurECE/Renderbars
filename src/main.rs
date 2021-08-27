@@ -1,4 +1,4 @@
-use handlebars::{Handlebars, Output};
+use handlebars::{Handlebars, Output, no_escape};
 use std::collections::HashMap;
 use clap::{Arg, App};
 use std::error::Error;
@@ -13,7 +13,7 @@ fn stdin_helper(
 ) -> Result<(), handlebars::RenderError> {
     let mut contents = String::new();
     io::stdin().read_to_string(&mut contents)?;
-    out.write(contents.as_str())?;
+    out.write(contents.trim_end())?;
     Ok(())
 }
 
@@ -62,6 +62,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     handlebars.register_helper("stdin", Box::new(stdin_helper));
     // raise RenderError if variable does not exist
     handlebars.set_strict_mode(true);
+    // Do not escape characters to HTML entities
+    handlebars.register_escape_fn(no_escape);
 
     let mut data = HashMap::new();
     if let Some(context_file) = matches.value_of("context-file") {
