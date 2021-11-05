@@ -1,6 +1,6 @@
 [package]
 name = "renderbars"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["Ethan D. Twardy <ethan.twardy@gmail.com>"]
 edition = "2018"
 

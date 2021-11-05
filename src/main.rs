@@ -54,7 +54,7 @@ fn context_from_file(filename: &str) ->
 
 fn main() -> Result<(), Box<dyn Error>> {
     let application = App::new("Renderbars")
-        .version("0.1.0")
+        .version("0.3.0")
         .author("Ethan D. Twardy <ethan.twardy@gmail.com>")
         .about("Render Handlebars templates on the command line")
         .arg(Arg::with_name("context")
