@@ -1,10 +1,37 @@
+///////////////////////////////////////////////////////////////////////////////
+// NAME:            main.rs
+//
+// AUTHOR:          Ethan D. Twardy <ethan.twardy@gmail.com>
+//
+// DESCRIPTION:     Entrypoint for the Renderbars application
+//
+// CREATED:         08/20/2021
+//
+// LAST EDITED:     11/05/2021
+//
+// Copyright 2021, Ethan D. Twardy
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+////
+
 use handlebars::{Handlebars, Output, no_escape};
 use std::collections::HashMap;
 use clap::{Arg, App};
 use std::error::Error;
 use std::fs::File;
 use std::io;
-use std::io::{BufRead, Read};
+use std::io::Read;
 
 fn stdin_helper(
     _: &handlebars::Helper, _: &handlebars::Handlebars,
@@ -17,17 +44,12 @@ fn stdin_helper(
     Ok(())
 }
 
-fn context_from_file(context: &mut HashMap<String, String>, filename: &str) -> Result<(), Box<dyn Error>> {
-    for entry in io::BufReader::new(File::open(filename)?).lines().map(|v| v.unwrap()) {
-        let line = entry.trim();
-        if line.is_empty() || line.chars().nth(0) == Some('#') {
-            continue;
-        }
-
-        let line = entry.splitn(2, '=').collect::<Vec<&str>>();
-        context.insert(line[0].trim().to_string(), line[1].trim().to_string());
-    }
-    Ok(())
+fn context_from_file(filename: &str) ->
+    Result<HashMap<String, String>, Box<dyn Error>>
+{
+    let mut reader = File::open(filename)?;
+    Ok(serde_yaml::from_reader::<&mut File, HashMap<String, String>>(
+        &mut reader)?)
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -65,10 +87,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     // Do not escape characters to HTML entities
     handlebars.register_escape_fn(no_escape);
 
-    let mut data = HashMap::new();
-    if let Some(context_file) = matches.value_of("context-file") {
-        context_from_file(&mut data, context_file)?;
-    }
+    let mut data = match matches.value_of("context-file") {
+        Some(filename) => context_from_file(&filename)?,
+        None => HashMap::new(),
+    };
+
     if let Some(context) = matches.values_of("context") {
         for entry in context.collect::<Vec<&str>>() {
             assert!(entry.contains('='),
@@ -96,3 +119,5 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
+
+///////////////////////////////////////////////////////////////////////////////
