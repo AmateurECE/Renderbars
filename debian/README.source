@@ -1,9 +1,0 @@
-renderbars for Debian
---------------------
-
-Renderbars is an application to render input files as Handlebars templates,
-taking context on the command line, and writing the resulting contents to an
-output file.
-
- -- Ethan D. Twardy <ethan.twardy@gmail.com>  Sat, 21 Aug 2021 20:45:27 -0500
-
