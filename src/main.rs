@@ -7,7 +7,7 @@
 //
 // CREATED:         08/20/2021
 //
-// LAST EDITED:     11/05/2021
+// LAST EDITED:     11/06/2021
 //
 // Copyright 2021, Ethan D. Twardy
 //
@@ -54,7 +54,7 @@ fn context_from_file(filename: &str) ->
 
 fn main() -> Result<(), Box<dyn Error>> {
     let application = App::new("Renderbars")
-        .version("0.3.0")
+        .version(env!("CARGO_PKG_VERSION"))
         .author("Ethan D. Twardy <ethan.twardy@gmail.com>")
         .about("Render Handlebars templates on the command line")
         .arg(Arg::with_name("context")
